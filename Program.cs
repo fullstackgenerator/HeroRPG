@@ -107,6 +107,7 @@
                 Console.WriteLine("Error: No enemy selected.");
             }
         }
+          Console.ReadKey();
     }
 
     // attack information and health calculation
