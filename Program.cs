@@ -1,16 +1,13 @@
-﻿using System;
-using System.Net;
-
-namespace SimpleRPG
+﻿namespace HeroRPG
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main(string[] _)
         {
             // Create hero
-            Console.WriteLine("What is your name?");
+            Console.WriteLine("What is your name?\n");
             Character hero = new Character();
-            hero.Name = Console.ReadLine();
+            hero.Name = Console.ReadLine() ?? "Hero";
             hero.Health = 100;
 
             // Create Enemies
@@ -19,12 +16,12 @@ namespace SimpleRPG
             Character enemyOrc = new Character { Name = "Orc", Health = 70 };
             Character enemyGhost = new Character { Name = "Ghost", Health = 80 };
 
-            Console.WriteLine("Who do you want to fight?");
-            Console.WriteLine("1 - Goblin\n2 - Skeleton\n3 - Orc\n4 - Ghost");
+            Console.WriteLine("\nWho do you want to fight?");
+            Console.WriteLine("\n1 - Goblin\n2 - Skeleton\n3 - Orc\n4 - Ghost\n");
 
             int choice;
-            Character selectedEnemy = null;
-            
+            Character? selectedEnemy = null;
+
             // select enemy
             while (true)
             {
@@ -43,7 +40,11 @@ namespace SimpleRPG
                     case 4: selectedEnemy = enemyGhost; break;
                 }
 
-                Console.WriteLine($"You have chosen to fight the {selectedEnemy.Name}!");
+                if (selectedEnemy != null)
+                {
+                    Console.WriteLine($"You have chosen to fight the {selectedEnemy.Name}!");
+                }
+
                 break;
             }
 
@@ -51,60 +52,68 @@ namespace SimpleRPG
 
             // battle start
 
-            while (selectedEnemy.Health > 0 && hero.Health > 0)
+            if (selectedEnemy != null)
             {
-                Console.WriteLine("\nPress Enter to attack...");
-                Console.ReadLine();
-                
-                // hero's attack
-                
-                hero.Attack();
-                bool enemyBlocked = rng.Next(2) == 0;
-                if (enemyBlocked)
+                while (selectedEnemy.Health > 0 && hero.Health > 0)
                 {
-                    Console.WriteLine($"{selectedEnemy.Name} blocked your attack!");
-                }
-                else
-                {
-                    int heroDamage = rng.Next(20, 40);
-                    selectedEnemy.TakeDamage(heroDamage);
+                    Console.WriteLine("\nPress Enter to attack...");
+                    Console.ReadLine();
+
+                    // hero's attack
+
+                    hero.Attack();
+                    bool enemyBlocked = rng.Next(2) == 0;
+                    if (enemyBlocked)
+                    {
+                        Console.WriteLine($"{selectedEnemy.Name} blocked your attack!");
+                    }
+                    else
+                    {
+                        int heroDamage = rng.Next(20, 40);
+                        selectedEnemy.TakeDamage(heroDamage);
+                    }
+
+                    if (selectedEnemy.Health <= 0)
+                    {
+                        Console.WriteLine($"\n{selectedEnemy.Name} has been defeated by {hero.Name}!");
+                        break;
+                    }
+
+                    //enemy's attack
+
+                    selectedEnemy.Attack();
+                    bool heroBlocked = rng.Next(2) == 0;
+                    if (heroBlocked)
+                    {
+                        Console.WriteLine($"{hero.Name} blocked the attack!");
+                    }
+                    else
+                    {
+                        int enemyDamage = rng.Next(10, 30);
+                        hero.TakeDamage(enemyDamage);
+                    }
+
+                    if (hero.Health <= 0)
+                    {
+                        Console.WriteLine($"\n{hero.Name} has fallen!");
+                    }
                 }
 
-                if (selectedEnemy.Health <= 0)
-                {
-                    Console.WriteLine($"\n{selectedEnemy.Name} has been defeated!");
-                    break;
-                }
-
-                //enemy's attack
-                
-                selectedEnemy.Attack();
-                bool heroBlocked = rng.Next(2) == 0;
-                if (heroBlocked)
-                {
-                    Console.WriteLine($"{hero.Name} blocked the attack!");
-                }
-                else
-                {
-                    int enemyDamage = rng.Next(10, 30);
-                    hero.TakeDamage(enemyDamage);
-                }
-
-                if (hero.Health <= 0)
-                {
-                    Console.WriteLine($"\n{hero.Name} has fallen!");
-                }
+                Console.WriteLine($"\nThe battle is finished! Press any key to exit...");
             }
 
-            Console.WriteLine($"\nThe battle is finished! Press any key to exit...");
+            else
+            {
+                Console.WriteLine("Error: No enemy selected.");
+            }
         }
     }
 
     // attack information and health calculation
-    
+
     public class Character
     {
-        public string Name;
+        public string? Name;
         public int Health;
 
         public void Attack()
